@@ -9,6 +9,8 @@
 #include "etatAction.h"
 #include "etatFinal.h"
 
+#include "US.h"
+
 // Définition des variables globales
 StateMachine machine = StateMachine();
 Button bouton(PIN_BOUTON);

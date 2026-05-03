@@ -40,4 +40,9 @@ extern StateMachine machine;
 extern Button bouton;
 extern unsigned long tempsDebut;
 
+
+#define capteur1 12
+#define capteur2 13
+
 #endif
+
