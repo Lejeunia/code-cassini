@@ -40,9 +40,58 @@ extern StateMachine machine;
 extern Button bouton;
 extern unsigned long tempsDebut;
 
+//----------------------------------------------------
+//Capteurs Ultra son HC-SR04
 
-#define capteur1 12
-#define capteur2 13
+//définition des broches
+#define PIN_TRIG_g 26
+#define PIN_ECHO_g 27
+
+#define PIN_TRIG_d 29
+#define PIN_ECHO_d 30
+
+//Configuration des constantes
+#define SOUND_SPEED 0,0343 // [cm/µs]
+#define US_TIMEOUT 30000
+
+
+//----------------------------------------------------
+//Stepper 17HS15 Nema17
+
+//Attribution des broches
+#define M1_STEP_PIN 32 //broche "STEP" du driver 1
+#define M1_DIR_PIN 33 //broche "DIR" du driver 1
+#define M1_ENABLE_PIN 34 //broche "enable" du driver 1
+
+#define M2_STEP_PIN 35
+#define M2_DIR_PIN 36
+#define M2_ENABLE_PIN 37
+
+#define M3_STEP_PIN 38
+#define M3_DIR_PIN 39
+#define M3_ENABLE_PIN 40
+
+#define M4_STEP_PIN 41
+#define M4_DIR_PIN 42
+#define M4_ENABLE_PIN 43
+
+//---------------------------------------------------
+//gyroscope MPU6050
+
+//Attribution des broches
+#define I2C_SDA 21
+#define I2C_SCL 22
+
+#define MPU_ADDR 0x68
+
+//---------------------------------------------------
+//servos FS5106B
+
+//Attribution des broches
+#define PIN_SERVO_1 4
+#define PIN_SERVO_2 5
+#define PIN_SERVO_3 6
+#define PIN_SERVO_4 7
 
 #endif
 

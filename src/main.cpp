@@ -11,6 +11,14 @@
 
 #include "US.h"
 
+#include "stepper.h"
+#include <AccelStepper.h> 
+#include <Arduino.h>
+
+#include "gyro.h"
+
+#include "servos.h"
+
 // Définition des variables globales
 StateMachine machine = StateMachine();
 Button bouton(PIN_BOUTON);
@@ -22,6 +30,8 @@ State* etatAttente = machine.addState(&EtatAttente);
 State* etatAction = machine.addState(&EtatAction);
 State* etatFinal = machine.addState(&EtatFinal);
 
+
+
 void setup() {
   // Initialisation de la communication série
   Serial.begin(9600);
@@ -31,6 +41,24 @@ void setup() {
   pinMode(PIN_LED, OUTPUT);
   // Pas besoin de configurer PIN_BOUTON car la librairie Button s'en charge
   bouton.begin();
+
+  //Initialisation des capteurs US
+  setupUltrasons();
+
+  Serial.println("Initialisation terminée.");
+
+  //Initialisation du gyroscope
+  if (setupGyro()==true){
+    Serial.println("MPU6050 prêt");
+  }
+
+  //Initialisation des servos
+  setupServos();
+
+  Serial.println("Robot initialisé");
+  Serial.println("Action : Le robot avance tout droit");
+  Serial.println("Commande : Tapez l'angle (1-180) dans le moniteur série");
+
   
   // Configuration des transitions
   etatInitial->addTransition(&transition_Initial_Attente, etatAttente);
@@ -51,4 +79,54 @@ void loop() {
   
   // Petit délai pour éviter une utilisation excessive du CPU
   delay(DELAI_BOUCLE_MS);
+
+  //-----------------------------------------------------------------------------------------
+  //Retour des capteurs ultra sons
+  float dist_g = getDistance(PIN_TRIG_g, PIN_ECHO_g);
+  float dist_d = getDistance(PIN_TRIG_d, PIN_ECHO_d);
+
+  Serial.print("Capteur gauche :"); //serial = intermédiaire entre arduino et pc (init serial.begin)
+  Serial.print(dist_g);
+  Serial.print("cm | Capteur droit :");
+  Serial.print(dist_d);
+  Serial.println("cm"); //ajoute un retour à la ligne
+
+  //-----------------------------------------------------------------------------------------
+  //Gyroscope MPU6050 
+  GyroData currentData = getGyroData();
+
+  Serial.print("----Gyroscope [rad/s]----");
+  Serial.print("X"); Serial.print(currentData.gyroX);
+  Serial.print(" | Y : "); Serial.print(currenData.gyroY);
+  Serial.print(" | Z : "); Serial.print(currenData.gyroZ);
+
+  
+  Serial.print("----Accéléromètre [m/s²]----");
+  Serial.print("X"); Serial.print(currentData.accX);
+  Serial.print(" | Y : "); Serial.print(currenData.accY);
+  Serial.print(" | Z : "); Serial.print(currenData.accZ);
+
+  //-----------------------------------------------------------------------------------------
+  //servos FS5106B
+  if (Serial.available() > 0) {
+        // On lit le nombre tapé dans la console
+        int angleSaisi = Serial.parseInt();
+
+        // Si l'angle est valide
+        if (angleSaisi >= 0 && angleSaisi <= 180) {
+            Serial.print("Déplacement des servos à : ");
+            Serial.print(angleSaisi);
+            Serial.println(" degrés.");
+
+            // On bouge les 4 servos en même temps à cet angle
+            for(int i = 1; i <= 4; i++) {
+                ecrireAngleServo(i, angleSaisi);
+            }
+        }
+    }
+
+    delay(20); // Petite pause pour laisser le temps à Serial.parseInt()
 }
+
+
+
