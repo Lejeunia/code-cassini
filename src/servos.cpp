@@ -11,6 +11,6 @@ void setupServos(){
 
 void ecrireAngleServo(int numServo, int angle){
     if (numServo >=1 && numServo <=4){
-        messervos[numServo - 1].write(angle);
-    }
+        messervos[numServo - 1].write(angle); //retranscrire le numéro de l'utilisateur à la machine
+    }                                   //.write(angle) = renvoie le signal de l'angle au servo
 }

@@ -58,7 +58,7 @@ extern unsigned long tempsDebut;
 //----------------------------------------------------
 //Stepper 17HS15 Nema17
 
-//Attribution des broches
+//Attribution des broches (en réalité, ce sont les broches du driver)
 #define M1_STEP_PIN 32 //broche "STEP" du driver 1
 #define M1_DIR_PIN 33 //broche "DIR" du driver 1
 #define M1_ENABLE_PIN 34 //broche "enable" du driver 1

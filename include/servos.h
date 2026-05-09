@@ -8,7 +8,7 @@
 void setupServos();
 
 void ecrireAngleServo(int numServo, int angle);
-
+//cette fonction a comme parapmètre le numéro du servo, et l'angle auquel il doit se positioner
 
 
 #endif 
