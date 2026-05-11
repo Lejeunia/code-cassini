@@ -35,18 +35,20 @@ State* etatFinal = machine.addState(&EtatFinal);
 void setup() {
   // Initialisation de la communication série
   Serial.begin(9600);
+  /*
   Serial.println("Démarrage de la machine d'état");
   
   // Configuration des broches
   pinMode(PIN_LED, OUTPUT);
   // Pas besoin de configurer PIN_BOUTON car la librairie Button s'en charge
   bouton.begin();
+  */
 
   //Initialisation des capteurs US
   setupUltrasons();
 
   Serial.println("Initialisation terminée.");
-
+  
   //Initialisation du gyroscope
   if (setupGyro()==true){
     Serial.println("MPU6050 prêt");
@@ -71,6 +73,7 @@ void setup() {
   
   // Démarrer la machine dans l'état initial
   machine.run();
+  
 }
 
 void loop() {
@@ -91,6 +94,9 @@ void loop() {
   Serial.print(dist_d);
   Serial.println("cm"); //ajoute un retour à la ligne
 
+  delay(200);
+
+  
   //-----------------------------------------------------------------------------------------
   //Gyroscope MPU6050 
   GyroData currentData = getGyroData();
@@ -108,9 +114,9 @@ void loop() {
 
   //-----------------------------------------------------------------------------------------
   //servos FS5106B
-  if (Serial.available() > 0) {
+  if (Serial.available() > 0) { // vérifie si ordre de l'utilisateur est encodé
         // On lit le nombre tapé dans la console
-        int angleSaisi = Serial.parseInt();
+        int angleSaisi = Serial.parseInt(); //transforme le caractère en un nombre entier
 
         // Si l'angle est valide
         if (angleSaisi >= 0 && angleSaisi <= 180) {
@@ -126,6 +132,7 @@ void loop() {
     }
 
     delay(20); // Petite pause pour laisser le temps à Serial.parseInt()
+    
 }
 
 

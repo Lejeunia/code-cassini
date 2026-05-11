@@ -7,8 +7,8 @@
 
 
 #include <Arduino.h>
-#include <StateMachine.h>
-#include <Button.h>
+//#include <StateMachine.h>   --------------------------------------------
+//#include <Button.h>           ------------------------------------------
 
 
 // ----------------------------------------------------------------
@@ -23,10 +23,11 @@
 // dans le code avant la compilation.
 // C'est une bonne pratique de mettre les constantes en majuscules.
 
-// Définition des broches
+/* Définition des broches
 #define PIN_LED 13
 #define PIN_BOUTON 2
 #define IR_RECEIVE_PIN 7
+*/
 
 
 // Définition des délais
@@ -36,8 +37,8 @@
 #define BLINK_HALF_TIME 500 // 500 ms pour un clignotement rapide 1Hz
 
 // Déclaration des variables globales (définies dans main.cpp)
-extern StateMachine machine;
-extern Button bouton;
+//extern StateMachine machine; ------------------------------------------------------
+//extern Button bouton; ---------------------------------------------------------
 extern unsigned long tempsDebut;
 
 //----------------------------------------------------
@@ -51,7 +52,7 @@ extern unsigned long tempsDebut;
 #define PIN_ECHO_d 30
 
 //Configuration des constantes
-#define SOUND_SPEED 0,0343 // [cm/µs]
+#define SOUND_SPEED 0.0343 // [cm/µs]
 #define US_TIMEOUT 30000
 
 
