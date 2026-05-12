@@ -1,9 +1,11 @@
-#ifndef SERVO_H
-#define SERVO_H
+#ifndef SERVOS_H
+#define SERVOS_H
 
 #include <Arduino.h>
-#include <servos.h>
+#include <Servo.h>
 #include "config.h"
+
+extern Servo messervos[4];
 
 void setupServos();
 
