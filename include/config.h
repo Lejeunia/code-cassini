@@ -94,5 +94,16 @@ extern unsigned long tempsDebut;
 #define PIN_SERVO_3 6
 #define PIN_SERVO_4 7
 
+//---------------------------------------------------
+//module nrf24l01
+
+#define NRF_CE_PIN  48
+#define NRF_CSN_PIN 49  
+
+const uint8_t  NRF_CHANNEL = 104;
+const uint64_t NRF_PIPE    = 0xE8E8F0F0A2;
+const uint8_t  NRF_DATARATE = 0; //débit de données est fixé à 250 KBPS
+
+
 #endif
 
