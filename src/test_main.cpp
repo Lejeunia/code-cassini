@@ -43,13 +43,15 @@ void loop() {
     // Quand le moteur a fini son mouvement
     if (m1.distanceToGo() == 0) {
         Serial.println("Cible atteinte. Pause...");
-        delay(1000); // Pause d'une seconde
+        delay(500);
         
         // Détermination de la nouvelle cible (Aller-Retour)
-        long nouvelleCible = (m1.currentPosition() == 0) ? 250 : 0;
+        long nouvelleCible = (m1.currentPosition() == 0) ? 1000 : 0; // Si on est à 0, aller à 1000, sinon revenir à 0
         
         Serial.print("Nouvelle destination : ");
         Serial.println(nouvelleCible);
+
+       
     }
 
     /*
