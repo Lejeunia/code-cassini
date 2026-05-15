@@ -46,3 +46,23 @@ void setMotorsEnabled(bool enabled){
     digitalWrite(M4_ENABLE_PIN, state);
 
 }
+
+void avancerMoteurs(long distance){
+    m1.moveTo(m1.currentPosition() + distance);
+    m2.moveTo(m2.currentPosition() + distance);
+    m3.moveTo(m3.currentPosition() + distance);
+    m4.moveTo(m4.currentPosition() + distance);
+
+    while (
+        m1.distanceToGo() != 0 || 
+        m2.distanceToGo() != 0 || 
+        m3.distanceToGo() != 0 || 
+        m4.distanceToGo() != 0
+    ) {
+        m1.run();
+        m2.run();
+        m3.run();
+        m4.run();
+    }
+    
+}

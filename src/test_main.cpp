@@ -4,6 +4,7 @@
 #include "servos.h"
 #include "stepper.h"
 #include <AccelStepper.h>
+#include "radio_manager.h"
 
 extern AccelStepper m1;
 
@@ -11,6 +12,9 @@ void setup() {
     
     Serial.begin(9600);
 
+    setupRadio();
+
+    /*
     // 1. Initialisation matérielle (configure les pins et les vitesses)
     setupMotors();
 
@@ -19,7 +23,7 @@ void setup() {
     Serial.println("Le moteur doit faire 1 tour (200 pas), pause, puis retour.");
 
     // On prépare le premier mouvement
-    m1.moveTo(1000); 
+    m1.moveTo(1000); */
 
     /*
     setupUltrasons();
@@ -31,12 +35,13 @@ void setup() {
     ecrireAngleServo(1, 0);
     Serial.println("servo 1 : 0°");*/
 
-
-
 }
 
 void loop() {
+    
+    checkRadio();
 
+    /*
     // Cette fonction doit être appelée en boucle pour générer les pas
     m1.run();
 
@@ -49,11 +54,9 @@ void loop() {
         long nouvelleCible = (m1.currentPosition() == 0) ? 1000 : 0; // Si on est à 0, aller à 1000, sinon revenir à 0
         
         Serial.print("Nouvelle destination : ");
-        Serial.println(nouvelleCible);
+        Serial.println(nouvelleCible); */
 
-       
-    }
-
+    
     /*
     float dG = getDistance(PIN_TRIG_g, PIN_ECHO_g);
     
@@ -65,6 +68,10 @@ void loop() {
     
 
     delay(1000);*/
+
+       
+    }
+
     
     
-}
+    

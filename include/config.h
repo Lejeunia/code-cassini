@@ -100,11 +100,11 @@ extern unsigned long tempsDebut;
 #define NRF_CE_PIN  48
 #define NRF_CSN_PIN 49  
 
-// Paramètres spécifiques au Groupe 2
 #define RF_CHANNEL 104                 // Canal 104
-#define RF_DATARATE RF24_250KBPS       // Débit 250 kbps
-#define RF_PA_LEVEL RF24_PA_LOW        // Low pour les tests en labo
-const uint64_t RECEPTION_PIPE = 0xE8E8F0F0A2LL; 
+#define RF_SPEED    RF24_250KBPS       // Débit 250 kbps
+const uint64_t RF_ADDRESS = 0xE8E8F0F0A2LL;
+
+#define PAYLOAD_SIZE 32 //32 octets max
 
 
 #endif

@@ -39,7 +39,7 @@ Cette machine d'état simple comporte quatre états :
 
 ## Structure du projet
 
-Le projet suit la structure standard platformIO. Les fichiers cpp, contenus dans le dossier src/ continent le code en lui même (gestion de la machine d'état, du bouton,...). Les fichiers h, contenus dans le dossier include/ contiennent les déclarations des fonctions et des variables utilisées dans le code.
+Le projet suit la structure standard PlatformIO. Les fichiers .cpp contenus dans le dossier src/ contiennent le code lui-même (gestion de la machine d'état, du bouton, ...). Les fichiers .h contenus dans le dossier include/ contiennent les déclarations des fonctions et des variables utilisées dans le code.
 Dans cette structure, chaque état du système a été intégré dans un fichier séparé, ce qui permet de mieux organiser le code et de faciliter la maintenance. Chaque fichier contient les fonctions spécifiques à l'état correspondant.
 Voici une représentation de la structure du projet :
 
@@ -75,7 +75,7 @@ lib_deps =
     https://github.com/Arduino-IRremote/Arduino-IRremote.git
 ```
 
-Le fichier `config.h` sert à configurer les broches et les paramètres globaux du projet. Vous pouvez ajuster ces paramètres selon vos besoins. idéalement, aucune valeur ne devrait être définie dans les autres fichiers source.
+Le fichier `config.h` sert à configurer les broches et les paramètres globaux du projet. Vous pouvez ajuster ces paramètres selon vos besoins. Idéalement, aucune valeur ne devrait être définie dans les autres fichiers source.
 
 
 # Simulation (Wokwi)
@@ -83,8 +83,8 @@ Le fichier `config.h` sert à configurer les broches et les paramètres globaux 
 Wokwi est un simulateur en ligne qui permet de tester vos projets Arduino sans matériel physique. Voici comment l'utiliser pour ce projet :
 
 ## Installation
-1. installez l'extension Wokwi pour VSCode : [Wokwi pour vscode](https://docs.wokwi.com/vscode/getting-started).
-2. Appuyez sur `F1` et tapez `Wokwi: requesta new license` pour obtenir une licence gratuite. Vous pouvez utiliser votre compte github pour vous connecter.
+1. Installez l'extension Wokwi pour VSCode : [Wokwi pour VSCode](https://docs.wokwi.com/vscode/getting-started).
+2. Appuyez sur `F1` et tapez `Wokwi: Request a new license` pour obtenir une licence gratuite. Vous pouvez utiliser votre compte GitHub pour vous connecter.
 
 ## Configuration du projet
 Deux fichiers sont nécessaires pour l'utilisation de Wokwi :
@@ -93,7 +93,7 @@ Deux fichiers sont nécessaires pour l'utilisation de Wokwi :
 
     - `diagram.json` : fichier de configuration des composants matériels. Il doit être à la racine du projet. Il contient les informations sur les composants matériels utilisés et leurs connexions. Ce fichier ne peut pas être édité dans VSCode en version gratuite, mais un éditeur est disponible en ligne en créant un projet dans Wokwi. Le contenu peut être copié et collé dans le fichier local.
 
-Ces fichier sont déjà présents dans le projet. Vous pouvez les modifier selon vos besoins. Pour plus d'informations, consultez la documentation officielle de Wokwi : [https://docs.wokwi.com](https://docs.wokwi.com).
+Ces fichiers sont déjà présents dans le projet. Vous pouvez les modifier selon vos besoins. Pour plus d'informations, consultez la documentation officielle de Wokwi : [https://docs.wokwi.com](https://docs.wokwi.com).
 
 *Remarque : pour éditer le fichier `diagram.json`, il est nécessaire de le renommer temporairement (par exemple, `diagram_.json`).*
 
