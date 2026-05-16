@@ -32,8 +32,7 @@ void setupRadio() {
 
 
 void interpreterCommandes(char* message) {
-    // Cette fonction doit être implémentée pour interpréter les commandes reçues
-    // et agir en conséquence (ex: déplacer un moteur, positionner un servo, ...)
+    // Cette fonction est implémentée pour interpréter les commandes reçues
 
     //1. Nettoyage 
     for (int i = 0; message[i] != '\0'; i++) {
