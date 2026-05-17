@@ -89,10 +89,10 @@ extern unsigned long tempsDebut;
 //servos FS5106B
 
 //Attribution des broches
-#define PIN_SERVO_1 4
-#define PIN_SERVO_2 5
-#define PIN_SERVO_3 6
-#define PIN_SERVO_4 7
+#define PIN_SERVO_3 4
+#define PIN_SERVO_4 5
+#define PIN_SERVO_1 6
+#define PIN_SERVO_2 7
 
 //---------------------------------------------------
 //module nrf24l01
@@ -105,6 +105,26 @@ extern unsigned long tempsDebut;
 const uint64_t RF_ADDRESS = 0xE8E8F0F0A2LL;
 
 #define PAYLOAD_SIZE 32 //32 octets max
+
+//------------------------------------------------
+//TOF VL53L4CD
+#pragma once
+
+// --- Broches I2C (Arduino Mega : SDA=20, SCL=21) ---
+#define TOF_SDA_PIN     20
+#define TOF_SCL_PIN     21
+
+// --- Broche XSHUT (optionnel, pour reset hardware) ---
+#define TOF_XSHUT_PIN  -1
+
+// --- Paramètres du capteur ---
+#define TOF_I2C_ADDRESS     0x29    // Adresse I2C par défaut
+#define TOF_TIMING_BUDGET   50      // ms (10 à 200 — précision vs vitesse)
+#define TOF_INTER_MEAS      55      // ms (doit être > timing budget)
+
+// --- Seuils de distance (en mm) ---
+#define DIST_SEUIL_PROCHE   15     // mm — "objet proche"
+#define DIST_SEUIL_LOIN     200     // mm — "objet loin"
 
 
 #endif
