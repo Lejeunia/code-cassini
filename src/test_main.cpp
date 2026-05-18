@@ -15,6 +15,9 @@ extern AccelStepper m4;
 unsigned long dernierArret = 0;
 TOFSensor tof;
 
+
+
+
 void setup() {
     
     Serial.begin(9600);
@@ -33,21 +36,20 @@ void setup() {
     Serial.println("  2-500  → m2 recule de 500 pas");*/
 
 
-    /*
+    
     setupUltrasons();
-    Serial.println("--- DEMARRAGE TEST ULTRASON ---");*/
+    Serial.println("--- DEMARRAGE TEST ULTRASON ---");
 
-    /*
+    
     setupServos();
     Serial.println("-----DEMARRAGE TEST SERVOS------");
-    Serial.println("Commande : numéro servo + angle (ex: 1+90)");*/
+    Serial.println("Commande : numéro servo + angle (ex: 1+90)");
 
-    // Initialisation du capteur TOF
+    /*
     if (!tof.begin()) {
-        Serial.println("Capteur non détecté — vérifiez le câblage.");
+        Serial.println("Capteur non détecté.");
         while (true);
-    }
-
+    }*/
 
 }
 
@@ -57,10 +59,10 @@ void loop() {
     checkRadio();*/
 
     /*
-    m1.run();
-    m2.run();
-    m3.run();
-    m4.run();
+    m1.run();   //jaune
+    m2.run();   //noir
+    m3.run();   //blanc
+    m4.run();   //vert
 
     if (Serial.available()) {
         String cmd = Serial.readStringUntil('\n');
@@ -75,7 +77,7 @@ void loop() {
         m3.disableOutputs();
         m4.disableOutputs();
 
-        if (moteur == 1) {
+        if (moteur == 1) { 
             m1.move(pas);
             Serial.print("M1 → ");
             Serial.println(pas);
@@ -96,22 +98,23 @@ void loop() {
         }
     }*/
 
-    /*
+    
     float dG = getDistance(PIN_TRIG_g, PIN_ECHO_g);
-    float dD = getDistance(PIN_TRIG_d, PIN_ECHO_d);
+    /*float dD = getDistance(PIN_TRIG_d, PIN_ECHO_d);*/
     
     
     Serial.print("Gauche :");
     Serial.print(dG);
     Serial.println(" cm");
     
+    /*
     Serial.print("Droite :");
     Serial.print(dD);
-    Serial.println(" cm");
+    Serial.println(" cm");*/
 
-    delay(1000);*/
+    delay(1000);
 
-    /*
+    
     //contrôle servos
     if (Serial.available()) {
         String cmd = Serial.readStringUntil('\n');
@@ -131,16 +134,17 @@ void loop() {
         else {
             Serial.println("Angle invalide (0-180) ou servo invalide (1-4)");
         }
-    }*/
+    }
 
+    /*
     if (tof.mesurer()) {
         Serial.print("Distance : ");
         Serial.print(tof.getDistance());
         Serial.println(" mm");
         tof.reagir();
-    }
+    }*/
 
-       
+    
 }
 
     
