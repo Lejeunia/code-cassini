@@ -177,7 +177,7 @@ void loop() {
         String cmd = Serial.readStringUntil('\n'); //commence la lecture du moniteur série j-> retour ligne 
         cmd.trim(); //supprime espaces 
 
-        // Commande direction : "droite" ou "gauche"
+        // Commande direction : "droite", "gauche" ou toutdroit
         if (cmd == "droite") {
             ecrireAngleServo(1, 135);
             ecrireAngleServo(2, 135);
@@ -191,6 +191,13 @@ void loop() {
             ecrireAngleServo(3, 135);
             ecrireAngleServo(4, 135);
             Serial.println("Virage gauche");
+        }
+        else if (cmd == "toutdroit") {
+            ecrireAngleServo(1, 95);
+            ecrireAngleServo(2, 93);
+            ecrireAngleServo(3, 99);
+            ecrireAngleServo(4, 95);
+            Serial.println("Tout droit");
         }
 
         // Commande groupée : "avant+90" ou "arriere+90"
