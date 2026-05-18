@@ -4,7 +4,7 @@
 #include "servos.h"
 #include "stepper.h"
 #include <AccelStepper.h>
-#include "radio_manager.h"
+#include "NRF.h"
 #include "TOF.h"
 
 extern AccelStepper m1;
@@ -12,8 +12,13 @@ extern AccelStepper m2;
 extern AccelStepper m3;
 extern AccelStepper m4;
 
-unsigned long dernierArret = 0;
+
 TOFSensor tof;
+
+unsigned long dernierChronoCapteurs = 0;
+const unsigned long INTERVALLE_LECTURE = 100; // On vérifie les capteurs toutes les 100 ms
+static uint8_t capteurActif = 0;  // 0 = gauche, 1 = droite
+static float distG = 999, distD = 999;
 
 
 
@@ -22,8 +27,16 @@ void setup() {
     
     Serial.begin(9600);
 
+    //------------------------------------------------------------
     /*
-    setupRadio();*/
+    Serial.println("=== DEMARRAGE ===");
+    if (!nrf.begin()) {
+        Serial.println("Arrêt — NRF non initialisé.");
+        while (true); // bloque si le module ne répond pas
+    }
+    //nrf.printDetails();
+    Serial.println("=== EN ATTENTE DE PAQUETS ===");
+    //-------------------------------------------------------------*/
 
     /*
     // 1. Initialisation matérielle (configure les pins et les vitesses)
@@ -35,15 +48,22 @@ void setup() {
     Serial.println("  2+500  → m2 avance de 500 pas");
     Serial.println("  2-500  → m2 recule de 500 pas");*/
 
-
+    /*
+    setupMotors();
+    
+    m1.moveTo(10000);
+    m3.moveTo(10000);
+    m4.moveTo(10000);
+    
     
     setupUltrasons();
-    Serial.println("--- DEMARRAGE TEST ULTRASON ---");
+    Serial.println("--- DEMARRAGE TEST ULTRASON ---");*/
 
     
     setupServos();
     Serial.println("-----DEMARRAGE TEST SERVOS------");
-    Serial.println("Commande : numéro servo + angle (ex: 1+90)");
+    Serial.println("Commande : numéro servo + angle (ex: 1+90)"); 
+    //servo 1 : 95°   2 : 93°   3 : 99°   4 : 95°
 
     /*
     if (!tof.begin()) {
@@ -54,9 +74,14 @@ void setup() {
 }
 
 void loop() {
-    
+
     /*
-    checkRadio();*/
+    nrf.update();
+    while (nrf.hasCommand()) {
+        String cmd = nrf.readCommand();
+        Serial.println("CMD: " + cmd);
+    }*/
+
 
     /*
     m1.run();   //jaune
@@ -98,23 +123,100 @@ void loop() {
         }
     }*/
 
-    
+    /*
+    //-────────────────────────────────────────────
+    // 1. Moteur tourne en continu 
+    m1.run();
+    m3.run();
+    m4.run();
+
+    // 2. Lecture alternée des capteurs (un seul par cycle)
+    if (millis() - dernierChronoCapteurs >= INTERVALLE_LECTURE) {
+        dernierChronoCapteurs = millis();
+
+        if (capteurActif == 0) {
+            distG = getDistance(PIN_TRIG_g, PIN_ECHO_g);
+            capteurActif = 1;
+        } else {
+            distD = getDistance(PIN_TRIG_d, PIN_ECHO_d);
+            capteurActif = 0;
+        }
+
+        // 3. Décision basée sur les deux dernières lectures
+        if ((distG > 0 && distG < 20) || (distD > 0 && distD < 20)) {
+            m1.stop();
+            m3.stop();
+            m4.stop();
+            Serial.println("Obstacle !");
+        } else {
+            // Redonner la cible si le moteur est arrêté
+            if ((m4.distanceToGo() == 0)||(m3.distanceToGo() == 0)||(m1.distanceToGo() == 0)) {
+                m1.moveTo(m1.currentPosition() + 10000);
+                m3.moveTo(m3.currentPosition() + 10000);
+                m4.moveTo(m4.currentPosition() + 10000);
+            }
+        }
+    }*/
+   //-────────────────────────────────────────────
+
+    /*
     float dG = getDistance(PIN_TRIG_g, PIN_ECHO_g);
-    /*float dD = getDistance(PIN_TRIG_d, PIN_ECHO_d);*/
+    float dD = getDistance(PIN_TRIG_d, PIN_ECHO_d);
     
     
     Serial.print("Gauche :");
     Serial.print(dG);
     Serial.println(" cm");
     
-    /*
+    
     Serial.print("Droite :");
     Serial.print(dD);
     Serial.println(" cm");*/
 
-    delay(1000);
+    if (Serial.available()) { //vérifie si les données sont arrivées sur le port série
+    String cmd = Serial.readStringUntil('\n'); //commence la lecture du moniteur série j-> retour ligne 
+    cmd.trim(); //supprime espaces 
 
-    
+        // Commande groupée : "avant+90" ou "arriere+90"
+        if (cmd.startsWith("avant+") || cmd.startsWith("arriere+")) {
+            int angle = cmd.substring(cmd.indexOf('+') + 1).toInt();
+
+            if (angle >= 0 && angle <= 180) {
+                if (cmd.startsWith("avant+")) {
+                    ecrireAngleServo(1, angle);
+                    ecrireAngleServo(2, angle);
+                    Serial.print("Servos avant → ");
+                } else {
+                    ecrireAngleServo(3, angle);
+                    ecrireAngleServo(4, angle);
+                    Serial.print("Servos arrière → ");
+                }
+                Serial.print(angle);
+                Serial.println("°");
+            } else {
+                Serial.println("Angle invalide (0-180)");
+            }
+        }
+        // Commande individuelle : "1+90"
+        else {
+            int numServo = cmd.charAt(0) - '0';
+            int angle = cmd.substring(2).toInt();
+
+            if (numServo >= 1 && numServo <= 4 && angle >= 0 && angle <= 180) {
+                ecrireAngleServo(numServo, angle);
+                Serial.print("Servo ");
+                Serial.print(numServo);
+                Serial.print(" → ");
+                Serial.print(angle);
+                Serial.println("°");
+            } else {
+                Serial.println("Angle invalide (0-180) ou servo invalide (1-4)");
+            }
+        }
+    }
+
+
+    /*
     //contrôle servos
     if (Serial.available()) {
         String cmd = Serial.readStringUntil('\n');
@@ -134,7 +236,8 @@ void loop() {
         else {
             Serial.println("Angle invalide (0-180) ou servo invalide (1-4)");
         }
-    }
+    }*/
+
 
     /*
     if (tof.mesurer()) {
@@ -144,7 +247,6 @@ void loop() {
         tof.reagir();
     }*/
 
-    
 }
 
     

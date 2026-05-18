@@ -24,16 +24,16 @@ void setupMotors(){
     digitalWrite(M4_ENABLE_PIN, LOW);
 
     //Réglage de la vitesse
-    m1.setMaxSpeed(1000);
+    m1.setMaxSpeed(200);
     m1.setAcceleration(500);
     
-    m2.setMaxSpeed(1000);
+    m2.setMaxSpeed(200);
     m2.setAcceleration(500);
 
-    m3.setMaxSpeed(1000);
+    m3.setMaxSpeed(200);
     m3.setAcceleration(500);
 
-    m4.setMaxSpeed(1000);
+    m4.setMaxSpeed(200);
     m4.setAcceleration(500);
 
 }
