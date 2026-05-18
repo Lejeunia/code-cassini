@@ -174,8 +174,24 @@ void loop() {
     Serial.println(" cm");*/
 
     if (Serial.available()) { //vérifie si les données sont arrivées sur le port série
-    String cmd = Serial.readStringUntil('\n'); //commence la lecture du moniteur série j-> retour ligne 
-    cmd.trim(); //supprime espaces 
+        String cmd = Serial.readStringUntil('\n'); //commence la lecture du moniteur série j-> retour ligne 
+        cmd.trim(); //supprime espaces 
+
+        // Commande direction : "droite" ou "gauche"
+        if (cmd == "droite") {
+            ecrireAngleServo(1, 135);
+            ecrireAngleServo(2, 135);
+            ecrireAngleServo(3, 45);
+            ecrireAngleServo(4, 45);
+            Serial.println("Virage droite");
+        }
+        else if (cmd == "gauche") {
+            ecrireAngleServo(1, 45);
+            ecrireAngleServo(2, 45);
+            ecrireAngleServo(3, 135);
+            ecrireAngleServo(4, 135);
+            Serial.println("Virage gauche");
+        }
 
         // Commande groupée : "avant+90" ou "arriere+90"
         if (cmd.startsWith("avant+") || cmd.startsWith("arriere+")) {
