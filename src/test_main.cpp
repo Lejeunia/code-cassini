@@ -6,15 +6,14 @@
 #include <AccelStepper.h>
 #include "NRF.h"
 #include "TOF.h"
+#include <Wire.h>
 
 extern AccelStepper m1;
 extern AccelStepper m2;
 extern AccelStepper m3;
 extern AccelStepper m4;
 
-
-unsigned long precedentMillis = 0;
-const long intervalleMesure = 100; // Fréquence de lecture (ici toutes les 100ms)
+TOF tof(&Wire);
 
 unsigned long dernierChronoCapteurs = 0;
 const unsigned long INTERVALLE_LECTURE = 100; // On vérifie les capteurs toutes les 100 ms
@@ -70,15 +69,22 @@ void setup() {
     // Serial.println("Commande : numéro servo + angle (ex: 1+90)"); 
     //servo 1 : 95°   2 : 93°   3 : 99°   4 : 95°
 
-    while (!Serial) { delay(10); } // Attente de la console série sur l'Arduino Mega
-    
-    Serial.println(F("=== DÉMARRAGE DU SYSTÈME ==="));
+    Serial.println();
+    Serial.println("=== TEST VL53L4CD ===");
 
-    // Initialisation du TOF
-    if (!initTOF()) {
-        Serial.println(F("Dysfonctionnement majeur : Arrêt du démarrage du TOF."));
-        // Vous pouvez décider de bloquer le code ici ou de continuer malgré tout
+    Wire.begin();
+
+    if (!tof.begin())
+    {
+        Serial.println("Echec initialisation TOF.");
+
+        while (1)
+        {
+            delay(100);
+        }
     }
+
+    Serial.println("TOF pret.");
 
 }
 
@@ -374,23 +380,9 @@ void loop() {
         }
     }*/
 
-    unsigned long actuelMillis = millis();
+    tof.update();
 
-    // Lecture non-bloquante du TOF à intervalles réguliers
-    if (actuelMillis - precedentMillis >= intervalleMesure) {
-        precedentMillis = actuelMillis;
-
-        int16_t distance = readDistanceTOF();
-
-        if (distance >= 0) {
-            Serial.print(F("Distance mesurée : "));
-            Serial.print(distance);
-            Serial.println(F(" mm"));
-        } else if (distance == -1) {
-            Serial.println(F("Erreur de lecture ou cible hors de portée."));
-        }
-        // Note: Le code ignore silencieusement le retour -2 (donnée pas encore prête)
-    }
+    delay(50);
 
 }
 

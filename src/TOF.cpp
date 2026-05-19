@@ -1,79 +1,58 @@
 #include "TOF.h"
-#include "config.h"
-#include <Wire.h>
-#include <vl53l4cd_class.h>
 
-// Création de l'instance du capteur en passant le bus I2C (Wire) et la broche XSHUT
-VL53L4CD sensor_vl53l4cd(&Wire, TOF_XSHUT_PIN);
+TOF::TOF(TwoWire *wire)
+{
+    m_wire = wire;
+    m_sensor = nullptr;
+}
 
-bool initTOF() {
-    // Initialisation du bus I2C (si ce n'est pas déjà fait ailleurs)
-    Wire.begin();
-    
-    // Configuration de la broche XSHUT si elle est définie
-    if (TOF_XSHUT_PIN >= 0) {
-        pinMode(TOF_XSHUT_PIN, OUTPUT);
-        digitalWrite(TOF_XSHUT_PIN, LOW);
-        delay(10);
-        digitalWrite(TOF_XSHUT_PIN, HIGH);
-        delay(10);
-    }
+bool TOF::begin()
+{
+    m_sensor = new VL53L4CD(m_wire, -1);
 
-    // Initialisation du composant
-    if (sensor_vl53l4cd.begin() != 0) {
-        Serial.println(F("[TOF] Erreur: Impossible de communiquer avec le VL53L4CD"));
+    Serial.println("Initialisation VL53L4CD...");
+
+    if (m_sensor->begin() != VL53L4CD_ERROR_NONE)
+    {
+        Serial.println("Erreur init VL53L4CD !");
         return false;
     }
 
-    // Arrêt d'une éventuelle mesure précédente pour appliquer la config
-    sensor_vl53l4cd.VL53L4CD_StopRanging();
+    Serial.println("VL53L4CD detecte.");
 
-    // Configuration du Timing Budget (Plus il est élevé, plus c'est précis, mais plus c'est lent)
-    if (sensor_vl53l4cd.VL53L4CD_SetRangeTiming(TOF_TIMING_BUDGET, 0) != 0) {
-        Serial.println(F("[TOF] Erreur: Impossible de configurer le Timing Budget"));
+    // Timing budget
+    m_sensor->VL53L4CD_SetRangeTiming(50, 0);
+
+    if (m_sensor->VL53L4CD_StartRanging() != VL53L4CD_ERROR_NONE)
+    {
+        Serial.println("Erreur start ranging !");
         return false;
     }
 
-    // Démarrage de la mesure continue
-    if (sensor_vl53l4cd.VL53L4CD_StartRanging() != 0) {
-        Serial.println(F("[TOF] Erreur: Impossible de démarrer les mesures"));
-        return false;
-    }
+    Serial.println("Ranging demarre.");
 
-    Serial.println(F("[TOF] Initialisation réussie !"));
     return true;
 }
 
-int16_t readDistanceTOF() {
-    uint8_t isDataReady = 0;
-    VL53L4CD_Result_t results;
-    int16_t distance = -1;
+void TOF::update()
+{
+    uint8_t newDataReady = 0;
 
-    // Vérifie si une nouvelle donnée est disponible
-    sensor_vl53l4cd.VL53L4CD_CheckForDataReady(&isDataReady);
-
-    if (isDataReady == 0) {
-        // Le capteur a configuré la mesure continue de manière asynchrone.
-        // Si aucune donnée n'est prête à cet instant T, on sort proprement (non-bloquant).
-        return -2; 
+    if (m_sensor->VL53L4CD_CheckForDataReady(&newDataReady) != VL53L4CD_ERROR_NONE)
+    {
+        Serial.println("Erreur data ready");
+        return;
     }
 
-    // Récupération des résultats
-    if (sensor_vl53l4cd.VL53L4CD_GetResult(&results) == 0) {
-        // On vérifie que le statut de la mesure est valide (0 = Valeur OK)
-        if (results.range_status == 0) {
-            distance = results.distance_mm;
-        } else {
-            // Statut d'erreur (ex: cible trop loin, signal trop faible...)
-            #ifdef DEBUG_TOF
-            Serial.print(F("[TOF] Statut mesure invalide : "));
-            Serial.println(results.range_status);
-            #endif
+    if (newDataReady)
+    {
+        if (m_sensor->VL53L4CD_GetResult(&m_results) == VL53L4CD_ERROR_NONE)
+        {
+            Serial.print("Distance: ");
+            Serial.print(m_results.distance_mm);
+            Serial.println(" mm");
         }
+
+        m_sensor->VL53L4CD_ClearInterrupt();
     }
-
-    // Efface le flag pour autoriser le capteur à prendre la mesure suivante
-    sensor_vl53l4cd.VL53L4CD_ClearInterrupt();
-
-    return distance;
 }

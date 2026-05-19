@@ -107,14 +107,11 @@ const uint64_t NRF_ADDRESS = 0xE8E8F0F0A2LL;
 
 
 //------------------------------------------------
-// =============================================================================
-// CONFIGURATION GLOBALE DU SYSTÈME
-// =============================================================================
-
-// --- Configuration du Capteur TOF (VL53L4CD) ---
-#define TOF_I2C_ADDRESS     0x29  // Adresse I2C par défaut du VL53L4CD
-#define TOF_XSHUT_PIN       4     // Broche Arduino Mega reliée au XSHUT du TOF (Optionnel, mettez -1 si non utilisé)
-#define TOF_TIMING_BUDGET   50    // Budget de temps en ms (valeurs possibles : 10ms à 200ms)
+// ==========================
+// I2C PINS ARDUINO MEGA
+// ==========================
+#define I2C_SDA_PIN 20
+#define I2C_SCL_PIN 21
 
 #endif
 
