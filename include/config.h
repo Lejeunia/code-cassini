@@ -94,6 +94,17 @@ extern unsigned long tempsDebut;
 #define PIN_SERVO_1 6
 #define PIN_SERVO_2 7
 
+//----------------------------------------------
+//NRF24L01
+#define NRF_cePin  48
+#define NRF_csnPin 53  
+ 
+#define NRF_CHANNEL 104                 // Canal 104
+#define NRF_SPEED    RF24_250KBPS       // Débit 250 kbps
+const uint64_t NRF_ADDRESS = 0xE8E8F0F0A2LL;
+ 
+#define NRF_PAYLOAD_SIZE 32 //32 octets max
+
 
 
 

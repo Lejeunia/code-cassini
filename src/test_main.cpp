@@ -19,6 +19,7 @@ unsigned long dernierChronoCapteurs = 0;
 const unsigned long INTERVALLE_LECTURE = 100; // On vérifie les capteurs toutes les 100 ms
 static uint8_t capteurActif = 0;  // 0 = gauche, 1 = droite
 static float distG = 999, distD = 999;
+NRF_Comm nrf(NRF_cePin, NRF_csnPin);   
 
 
 
@@ -28,7 +29,7 @@ void setup() {
     Serial.begin(9600);
 
     //------------------------------------------------------------
-    /*
+    
     Serial.println("=== DEMARRAGE ===");
     if (!nrf.begin()) {
         Serial.println("Arrêt — NRF non initialisé.");
@@ -36,7 +37,7 @@ void setup() {
     }
     //nrf.printDetails();
     Serial.println("=== EN ATTENTE DE PAQUETS ===");
-    //-------------------------------------------------------------*/
+    //-------------------------------------------------------------
 
     /*
     // 1. Initialisation matérielle (configure les pins et les vitesses)
@@ -52,17 +53,18 @@ void setup() {
     setupMotors();
     
     m1.moveTo(10000);
+    m2.moveTo(10000);
     m3.moveTo(10000);
-    m4.moveTo(10000);
+    m4.moveTo(10000);*/
     
-    
+    /*
     setupUltrasons();
     Serial.println("--- DEMARRAGE TEST ULTRASON ---");*/
 
-    
+    /*
     setupServos();
     Serial.println("-----DEMARRAGE TEST SERVOS------");
-    Serial.println("Commande : numéro servo + angle (ex: 1+90)"); 
+    Serial.println("Commande : numéro servo + angle (ex: 1+90)"); */
     //servo 1 : 95°   2 : 93°   3 : 99°   4 : 95°
 
     /*
@@ -75,12 +77,12 @@ void setup() {
 
 void loop() {
 
-    /*
+    
     nrf.update();
     while (nrf.hasCommand()) {
         String cmd = nrf.readCommand();
         Serial.println("CMD: " + cmd);
-    }*/
+    }
 
 
     /*
@@ -127,6 +129,7 @@ void loop() {
     //-────────────────────────────────────────────
     // 1. Moteur tourne en continu 
     m1.run();
+    m2.run();
     m3.run();
     m4.run();
 
@@ -173,11 +176,12 @@ void loop() {
     Serial.print(dD);
     Serial.println(" cm");*/
 
+    /*
     if (Serial.available()) { //vérifie si les données sont arrivées sur le port série
         String cmd = Serial.readStringUntil('\n'); //commence la lecture du moniteur série j-> retour ligne 
         cmd.trim(); //supprime espaces 
 
-        // Commande direction : "droite", "gauche" ou toutdroit
+        // Commande direction : "droite", "gauche" ou "toutdroit"
         if (cmd == "droite") {
             ecrireAngleServo(1, 135);
             ecrireAngleServo(2, 135);
@@ -200,7 +204,7 @@ void loop() {
             Serial.println("Tout droit");
         }
 
-        // Commande groupée : "avant+90" ou "arriere+90"
+        // Commande groupée : "avant+angle" ou "arriere+angle"
         if (cmd.startsWith("avant+") || cmd.startsWith("arriere+")) {
             int angle = cmd.substring(cmd.indexOf('+') + 1).toInt();
 
@@ -236,7 +240,7 @@ void loop() {
                 Serial.println("Angle invalide (0-180) ou servo invalide (1-4)");
             }
         }
-    }
+    }*/
 
 
     /*
