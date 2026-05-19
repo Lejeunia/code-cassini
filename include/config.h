@@ -76,6 +76,10 @@ extern unsigned long tempsDebut;
 #define M4_DIR_PIN 42
 #define M4_ENABLE_PIN 43
 
+#define PAS_ROTATION_360 942
+#define PAS_ROTATION_90  236
+
+
 //---------------------------------------------------
 //gyroscope MPU6050
 

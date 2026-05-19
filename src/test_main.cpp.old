@@ -22,12 +22,35 @@ static float distG = 999, distD = 999;
 NRF_Comm nrf(NRF_cePin, NRF_csnPin);  
 bool obstacleDetecte = false; 
 
-
+void cmdAvancer();
+void cmdReculer();
+void cmdGauche();
+void cmdDroite();
+void cmdStop();
+void traiterCommande(const String& cmd);
 
 
 void setup() {
     
     Serial.begin(9600);
+
+    //test nrf------------------------------------------
+    while (!Serial) { delay(10); }
+    
+    Serial.println(F("=== DÉMARRAGE DU SYSTÈME ==="));
+    
+    setupMotors();
+    setupServos();
+    setupUltrasons();
+    
+    if (!nrf.begin()) {
+        Serial.println(F("Arrêt — NRF non initialisé."));
+        while (true);
+    }
+    
+    Serial.println(F("=== EN ATTENTE DE COMMANDES NRF ==="));
+    Serial.println(F("Commandes : start | avancer | reculer | gauche | droite | stop"));
+    //------------------------------------------------
 
     /*
     //------------------------------------------------------------
@@ -52,7 +75,7 @@ void setup() {
     Serial.println("  2-500  → m2 recule de 500 pas");*/
 
     
-    // setupMotors();
+    setupMotors();
     
     // m1.moveTo(10000);
     // m2.moveTo(10000);
@@ -60,15 +83,17 @@ void setup() {
     // m4.moveTo(10000);
 
     
-    // setupUltrasons();
-    // Serial.println("--- DEMARRAGE TEST ULTRASON ---");
+    setupUltrasons();
+    Serial.println("--- DEMARRAGE TEST ULTRASON ---");
 
     
-    // setupServos();
-    // Serial.println("-----DEMARRAGE TEST SERVOS------");
-    // Serial.println("Commande : numéro servo + angle (ex: 1+90)"); 
+    setupServos();
+    /*
+    Serial.println("-----DEMARRAGE TEST SERVOS------");
+    Serial.println("Commande : numéro servo + angle (ex: 1+90)"); */
     //servo 1 : 95°   2 : 93°   3 : 99°   4 : 95°
 
+    /*
     Serial.println();
     Serial.println("=== TEST VL53L4CD ===");
 
@@ -84,7 +109,7 @@ void setup() {
         }
     }
 
-    Serial.println("TOF pret.");
+    Serial.println("TOF pret.");*/
 
 }
 
@@ -141,7 +166,7 @@ void loop() {
     }*/
 
 
-    /*V1
+    /*
     //-────────────────────────────────────────────
     // 1. Moteur tourne en continu 
     m1.run();
@@ -214,6 +239,120 @@ void loop() {
         }
     }
    //-────────────────────────────────────────────*/
+
+
+
+
+
+
+    // 1. FAIRE TOURNER LES MOTEURS (Priorité absolue)
+    m1.run();
+    m2.run();
+    m3.run();
+    m4.run();
+
+    bool unObstacleExiste = false;
+
+    // =========================================================================
+    // MISE À JOUR DU TOF
+    // =========================================================================
+    // On appelle ta fonction d'origine. Elle gère l'affichage "Distance: XX mm" 
+    // elle-même sur le port série dès qu'une donnée est prête.
+    tof.update();
+
+    uint16_t distanceTOF = tof.getDistance(); 
+
+    if (distanceTOF > 0 && distanceTOF < 500) {
+        unObstacleExiste = true;
+        Serial.print(F("!!! Freinage d'urgence - Obstacle TOF proche : "));
+        Serial.print(distanceTOF);
+        Serial.println(F(" mm !!!"));
+    }
+
+    // =========================================================================
+    // LECTURE ALTERNÉE DES CAPTEURS ULTRASONS (Chrono non-bloquant)
+    // =========================================================================
+    if (millis() - dernierChronoCapteurs >= INTERVALLE_LECTURE) {
+        dernierChronoCapteurs = millis();
+
+        if (capteurActif == 0) {
+            distG = getDistance(PIN_TRIG_g, PIN_ECHO_g);
+            capteurActif = 1;
+        } else {
+            distD = getDistance(PIN_TRIG_d, PIN_ECHO_d);
+            capteurActif = 0;
+        }
+
+        // DEBUG : Affichage bridé pour ne pas faire ramer les moteurs
+        Serial.print(F("US_G: ")); Serial.print(distG);
+        Serial.print(F(" cm | US_D: ")); Serial.print(distD);
+        Serial.print(F(" cm | Restant_M1: ")); Serial.println(m1.distanceToGo());
+    }
+
+    // Détection des obstacles via les Ultrasons
+    if ((distG > 0 && distG < 20) || (distD > 0 && distD < 20)) {
+        unObstacleExiste = true;
+        Serial.println(F("!!! Freinage d'urgence - Obstacle Ultrason !!!"));
+    }
+
+    // =========================================================================
+    // DÉCISION ET CONTRÔLE DES MOTEURS
+    // =========================================================================
+    if (unObstacleExiste) {
+        // ARRET IMMEDIAT
+        m1.stop(); m2.stop(); m3.stop(); m4.stop();
+        
+        m1.setCurrentPosition(m1.currentPosition());
+        m2.setCurrentPosition(m2.currentPosition());
+        m3.setCurrentPosition(m3.currentPosition());
+        m4.setCurrentPosition(m4.currentPosition());
+    } 
+    else {
+        // VOIE LIBRE : On relance une cible uniquement si les moteurs sont arrêtés
+        if (m1.distanceToGo() == 0 && m2.distanceToGo() == 0 && 
+            m3.distanceToGo() == 0 && m4.distanceToGo() == 0) {
+            
+            obstacleDetecte = false;
+            Serial.println(F("[MOUVEMENT] Route degagee, en avant !"));
+            
+            m1.moveTo(m1.currentPosition() + 10000);
+            m2.moveTo(m2.currentPosition() + 10000);    
+            m3.moveTo(m3.currentPosition() + 10000);
+            m4.moveTo(m4.currentPosition() + 10000);
+        }
+    }
+    nrf.update();
+    while (nrf.hasCommand()) {
+        String cmd = nrf.readCommand();
+        cmd.trim();
+        cmd.toLowerCase();
+        Serial.print(F("[NRF] Reçu : "));
+        Serial.println(cmd);
+        traiterCommande(cmd);
+    }
+
+
+    // =========================================================================
+    // VERROUILLAGE DES SERVOS
+    // =========================================================================
+    if (m1.isRunning() || m2.isRunning() || m3.isRunning() || m4.isRunning()) {
+        ecrireAngleServo(1, 95);
+        ecrireAngleServo(2, 93);
+        ecrireAngleServo(3, 99);
+        ecrireAngleServo(4, 95);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     /*
     // 1. Moteurs tournent en continu
@@ -380,11 +519,112 @@ void loop() {
         }
     }*/
 
+    //--------------------------------------------────
+    // Lecture TOF/
+    /*
     tof.update();
 
-    delay(50);
+    delay(50);*/
+    //------    
+
 
 }
+
+//----------------------------------------------------------------------------------------
+//Commandes NRF
+
+void cmdAvancer() {
+    ecrireAngleServo(1, 95);
+    ecrireAngleServo(2, 93);
+    ecrireAngleServo(3, 99);
+    ecrireAngleServo(4, 95);
+
+    m1.moveTo(m1.currentPosition() + 10000);
+    m2.moveTo(m2.currentPosition() + 10000);
+    m3.moveTo(m3.currentPosition() + 10000);
+    m4.moveTo(m4.currentPosition() + 10000);
+
+    Serial.println(F("[CMD] Avancer"));
+
+}
+
+void cmdReculer() {
+    ecrireAngleServo(1, 95);
+    ecrireAngleServo(2, 93);
+    ecrireAngleServo(3, 99);
+    ecrireAngleServo(4, 95);
+
+    m1.moveTo(m1.currentPosition() - 10000);
+    m2.moveTo(m2.currentPosition() - 10000);
+    m3.moveTo(m3.currentPosition() - 10000);
+    m4.moveTo(m4.currentPosition() - 10000);
+
+    Serial.println(F("[CMD] Reculer"));
+}
+
+void cmdGauche() {
+    ecrireAngleServo(1, 45);
+    ecrireAngleServo(2, 45);
+    ecrireAngleServo(3, 135);
+    ecrireAngleServo(4, 135);
+
+    Serial.println(F("[CMD] Virage gauche"));
+}
+
+void cmdDroite() {
+    ecrireAngleServo(1, 135);
+    ecrireAngleServo(2, 135);
+    ecrireAngleServo(3, 45);
+    ecrireAngleServo(4, 45);
+
+    Serial.println(F("[CMD] Virage droite"));
+}
+
+void cmdStop() {
+    m1.stop();
+    m2.stop();
+    m3.stop();
+    m4.stop();
+
+    // Roues droites quand arrêté
+    ecrireAngleServo(1, 95);
+    ecrireAngleServo(2, 93);
+    ecrireAngleServo(3, 99);
+    ecrireAngleServo(4, 95);
+
+    Serial.println(F("[CMD] Stop"));
+}
+
+void traiterCommande(const String& cmd) {
+    if (cmd == "start" || cmd == "avancer") {
+        cmdAvancer();
+    }
+    else if (cmd == "reculer" || cmd == "recule") {
+        cmdReculer();
+    }
+    else if (cmd == "gauche") {
+        cmdGauche();
+    }
+    else if (cmd == "droite") {
+        cmdDroite();
+    }
+    else if (cmd == "stop" || cmd == "arret") {
+        cmdStop();
+    }
+    else {
+        Serial.print(F("[NRF] Commande inconnue : "));
+        Serial.println(cmd);
+    }
+}
+ 
+
+
+
+
+
+  
+
+
 
     
     

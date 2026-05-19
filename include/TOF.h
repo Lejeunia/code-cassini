@@ -12,6 +12,7 @@ public:
 
     bool begin();
     void update();
+    uint16_t getDistance() { return m_results.distance_mm; }
 
 private:
     TwoWire *m_wire;
@@ -19,5 +20,9 @@ private:
 
     VL53L4CD_Result_t m_results;
 };
+
+
+
+
 
 #endif

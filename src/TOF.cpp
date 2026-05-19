@@ -21,7 +21,7 @@ bool TOF::begin()
     Serial.println("VL53L4CD detecte.");
 
     // Timing budget
-    m_sensor->VL53L4CD_SetRangeTiming(50, 0);
+    m_sensor->VL53L4CD_SetRangeTiming(200, 0);
 
     if (m_sensor->VL53L4CD_StartRanging() != VL53L4CD_ERROR_NONE)
     {
@@ -56,3 +56,4 @@ void TOF::update()
         m_sensor->VL53L4CD_ClearInterrupt();
     }
 }
+

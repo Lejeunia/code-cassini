@@ -36,4 +36,5 @@ private:
     void _enqueueCommand(const char* start, int len);
 };
 
+
 #endif

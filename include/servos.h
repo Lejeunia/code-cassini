@@ -10,7 +10,7 @@ extern Servo messervos[4];
 void setupServos();
 
 void ecrireAngleServo(int numServo, int angle);
-//cette fonction a comme parapmètre le numéro du servo, et l'angle auquel il doit se positioner
+//cette fonction a comme paramètre le numéro du servo, et l'angle auquel il doit se positioner
 
 
 #endif 
