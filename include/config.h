@@ -106,22 +106,15 @@ const uint64_t NRF_ADDRESS = 0xE8E8F0F0A2LL;
 #define NRF_PAYLOAD_SIZE 32 //32 octets max
 
 
-
-
-
 //------------------------------------------------
-//TOF VL53L4CD
-#pragma once
+// =============================================================================
+// CONFIGURATION GLOBALE DU SYSTÈME
+// =============================================================================
 
-#define TOF_SDA_PIN         20
-#define TOF_SCL_PIN         21
-
-#define TOF_XSHUT_PIN       22
-
-#define TOF_TIMING_BUDGET   200 //précision de la mesure contre vitesse
-
-#define DIST_SEUIL_PROCHE   15  //distance min [mm]
-#define DIST_SEUIL_LOIN     200 //distance max
+// --- Configuration du Capteur TOF (VL53L4CD) ---
+#define TOF_I2C_ADDRESS     0x29  // Adresse I2C par défaut du VL53L4CD
+#define TOF_XSHUT_PIN       4     // Broche Arduino Mega reliée au XSHUT du TOF (Optionnel, mettez -1 si non utilisé)
+#define TOF_TIMING_BUDGET   50    // Budget de temps en ms (valeurs possibles : 10ms à 200ms)
 
 #endif
 

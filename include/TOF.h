@@ -4,17 +4,21 @@
 #include <vl53l4cd_class.h>
 #include "config.h"
 
-class TOFSensor {
-public:
-    TOFSensor();
-    bool     begin();
-    bool     mesurer();
-    void     reagir();
-    uint16_t getDistance();
-    uint8_t  getStatus();
+#ifndef TOF_H
+#define TOF_H
 
-private:
-    VL53L4CD _sensor;
-    uint16_t _distance_mm;
-    uint8_t  _status;
-};
+#include <Arduino.h>
+
+/**
+ * @brief Initialise le capteur TOF VL53L4CD.
+ * @return true si l'initialisation a réussi, false sinon.
+ */
+bool initTOF();
+
+/**
+ * @brief Lit la distance actuelle mesurée par le capteur.
+ * @return La distance en millimètres (mm). Retourne -1 en cas d'erreur de lecture.
+ */
+int16_t readDistanceTOF();
+
+#endif 
